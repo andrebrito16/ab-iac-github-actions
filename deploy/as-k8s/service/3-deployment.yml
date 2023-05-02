@@ -39,6 +39,7 @@ spec:
       labels: #@ deploymentTemplateLabels
     spec:
       restartPolicy: Always
+      imagePullPolicy: IfNotPresent
       nodeSelector: #@ ListToMap(data.values.deployment.nodeSelector)
 
       #@ if/end data.values.deployment.imagePullSecrets:
@@ -49,6 +50,10 @@ spec:
         - name: #@ data.values.deployment.name
           image: #@ "{}/{}/{}:{}".format(data.values.containerRegistry, data.values.organization, data.values.repository, data.values.tag)
           imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: #@ data.values.port
+          #@ for/end portNumber in data.values.deployment.ports:
+            - containerPort: #@ portNumber
 
           #@  deploymentResources = {
           #@    "limits": ListToMap(data.values.deployment.resources.limits),
